@@ -4,6 +4,8 @@ import { pgTable, text, timestamp, serial, integer } from 'drizzle-orm/pg-core'
 // kind: 'private' = low-star feedback submitted to admin
 //       'google' = high-star guest clicked through to Google review
 //       'tripadvisor' = high-star guest clicked through to TripAdvisor review
+//       'booking' = high-star guest clicked through to Booking.com review
+//       'expedia' = high-star guest clicked through to Expedia review
 export const feedback = pgTable('feedback', {
   id: serial('id').primaryKey(),
   hotelSlug: text('hotel_slug').notNull(),

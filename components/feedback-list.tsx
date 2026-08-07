@@ -8,6 +8,10 @@ import { deleteFeedback } from '@/app/actions/feedback'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { Feedback } from '@/lib/db/schema'
+import {
+  REVIEW_PROVIDER_LABELS,
+  type PublicReviewProvider,
+} from '@/lib/review-platforms'
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -68,7 +72,10 @@ export function FeedbackList({
   return (
     <div className="flex flex-col gap-4">
       {items.map((item) => {
-        const isTripAdvisor = item.kind === 'tripadvisor'
+        const isPublicReview = item.kind !== 'private'
+        const providerLabel = isPublicReview
+          ? REVIEW_PROVIDER_LABELS[item.kind as PublicReviewProvider] || item.kind
+          : null
         return (
           <Card key={item.id} className="p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -78,15 +85,15 @@ export function FeedbackList({
                   <span
                     className={cn(
                       'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium',
-                      isTripAdvisor
+                      isPublicReview
                         ? 'bg-secondary text-secondary-foreground'
                         : 'bg-destructive/10 text-destructive',
                     )}
                   >
-                    {isTripAdvisor ? (
+                    {isPublicReview ? (
                       <>
                         <ExternalLink className="size-3" />
-                        Sent to TripAdvisor
+                        Sent to {providerLabel}
                       </>
                     ) : (
                       'Private feedback'
@@ -109,7 +116,7 @@ export function FeedbackList({
               </Button>
             </div>
 
-            {!isTripAdvisor && (
+            {!isPublicReview && (
               <div className="mt-4 flex flex-col gap-3">
                 {item.message && (
                   <p className="rounded-lg bg-muted p-3 text-sm leading-relaxed text-foreground">

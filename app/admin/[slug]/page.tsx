@@ -6,10 +6,19 @@ import { FeedbackList } from '@/components/feedback-list'
 import { SignOutButton } from '@/components/sign-out-button'
 import { Card } from '@/components/ui/card'
 import { findHotel } from '@/lib/hotels'
+import {
+  REVIEW_PROVIDER_LABELS,
+  type PublicReviewProvider,
+} from '@/lib/review-platforms'
 
 export const dynamic = 'force-dynamic'
 
-type FeedbackProvider = 'private' | 'google' | 'tripadvisor'
+type FeedbackProvider =
+  | 'private'
+  | 'google'
+  | 'tripadvisor'
+  | 'booking'
+  | 'expedia'
 
 type Props = {
   params: Promise<{
@@ -62,7 +71,7 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
     ? [resolvedSearchParams.providers]
     : []
   const selectedProviders = providerParams.filter((provider) =>
-    ['private', 'google', 'tripadvisor'].includes(provider),
+    ['private', 'google', 'tripadvisor', 'booking', 'expedia'].includes(provider),
   ) as FeedbackProvider[]
 
   const filters = {
@@ -90,6 +99,8 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
   const privateCount = feedback.filter((f) => f.kind === 'private').length
   const googleCount = feedback.filter((f) => f.kind === 'google').length
   const tripAdvisorCount = feedback.filter((f) => f.kind === 'tripadvisor').length
+  const bookingCount = feedback.filter((f) => f.kind === 'booking').length
+  const expediaCount = feedback.filter((f) => f.kind === 'expedia').length
   const avgRating =
     total > 0
       ? (feedback.reduce((sum, f) => sum + f.rating, 0) / total).toFixed(1)
@@ -127,7 +138,15 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
           <div>
             <p className="text-sm font-semibold text-foreground">Filter by provider</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              {(['private', 'google', 'tripadvisor'] as FeedbackProvider[]).map((provider) => (
+              {(
+                [
+                  'private',
+                  'google',
+                  'tripadvisor',
+                  'booking',
+                  'expedia',
+                ] as FeedbackProvider[]
+              ).map((provider) => (
                 <label
                   key={provider}
                   className="inline-flex items-center gap-2 rounded-md border border-muted/50 bg-background px-3 py-2 text-sm"
@@ -139,7 +158,11 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
                     defaultChecked={selectedProviders.includes(provider)}
                     className="h-4 w-4 rounded border-muted/50 text-primary"
                   />
-                  {provider === 'private' ? 'Private' : provider === 'google' ? 'Google' : 'TripAdvisor'}
+                  {provider === 'private'
+                    ? 'Private'
+                    : REVIEW_PROVIDER_LABELS[
+                        provider as PublicReviewProvider
+                      ]}
                 </label>
               ))}
             </div>
@@ -214,7 +237,9 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
         />
         <StatCard
           label="Sent to public review"
-          value={String(googleCount + tripAdvisorCount)}
+          value={String(
+            googleCount + tripAdvisorCount + bookingCount + expediaCount,
+          )}
           icon={<ExternalLink className="size-5" />}
         />
       </section>

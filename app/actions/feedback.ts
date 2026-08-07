@@ -17,7 +17,12 @@ async function requireAdmin(slug?: string) {
   if (!(await isAdmin(slug))) throw new Error('Unauthorized')
 }
 
-type FeedbackProvider = 'private' | 'google' | 'tripadvisor'
+type FeedbackProvider =
+  | 'private'
+  | 'google'
+  | 'tripadvisor'
+  | 'booking'
+  | 'expedia'
 
 type FeedbackFilters = {
   providers?: FeedbackProvider[]
@@ -38,7 +43,7 @@ type SubmitPrivateArgs = {
 type LogReviewClickArgs = {
   hotelSlug: string
   rating: number
-  provider: 'google' | 'tripadvisor'
+  provider: Exclude<FeedbackProvider, 'private'>
 }
 
 type DemoFeedbackRecord = {
@@ -207,7 +212,9 @@ export async function getAllFeedback(
 
   if (filters?.providers?.length) {
     const validProviders = filters.providers.filter((provider) =>
-      ['private', 'google', 'tripadvisor'].includes(provider),
+      ['private', 'google', 'tripadvisor', 'booking', 'expedia'].includes(
+        provider,
+      ),
     ) as FeedbackProvider[]
 
     if (validProviders.length) {
