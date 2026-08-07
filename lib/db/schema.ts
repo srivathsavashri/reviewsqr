@@ -16,4 +16,18 @@ export const feedback = pgTable('feedback', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
+export const hotels = pgTable('hotels', {
+  id: serial('id').primaryKey(),
+  slug: text('slug').notNull().unique(),
+  name: text('name').notNull(),
+  location: text('location').notNull(),
+  googleReviewUrl: text('google_review_url').notNull(),
+  tripAdvisorUrl: text('tripadvisor_url').notNull(),
+  adminUsername: text('admin_username').notNull(),
+  adminPassword: text('admin_password').notNull(),
+  adminEmail: text('admin_email').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
 export type Feedback = typeof feedback.$inferSelect
+export type HotelRecord = typeof hotels.$inferSelect

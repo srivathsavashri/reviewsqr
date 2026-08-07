@@ -12,16 +12,16 @@ export const dynamic = 'force-dynamic'
 type FeedbackProvider = 'private' | 'google' | 'tripadvisor'
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string
-  }
-  searchParams: {
+  }>
+  searchParams: Promise<{
     providers?: string | string[]
     period?: string
     startDate?: string
     endDate?: string
     sent?: string
-  }
+  }>
 }
 
 function StatCard({
@@ -50,15 +50,16 @@ function StatCard({
 
 export default async function HotelAdminPage({ params, searchParams }: Props) {
   const { slug } = await params
-  const hotel = findHotel(slug)
+  const hotel = await findHotel(slug)
   if (!hotel) return notFound()
 
-  if (!(await isAdmin(slug))) redirect(`/hotel/${slug}`)
+  if (!(await isAdmin(slug))) redirect(`/hotel/${slug}/sign-in`)
 
-  const providerParams = Array.isArray(searchParams.providers)
-    ? searchParams.providers
-    : searchParams.providers
-    ? [searchParams.providers]
+  const resolvedSearchParams = await searchParams
+  const providerParams = Array.isArray(resolvedSearchParams.providers)
+    ? resolvedSearchParams.providers
+    : resolvedSearchParams.providers
+    ? [resolvedSearchParams.providers]
     : []
   const selectedProviders = providerParams.filter((provider) =>
     ['private', 'google', 'tripadvisor'].includes(provider),
@@ -66,9 +67,9 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
 
   const filters = {
     providers: selectedProviders,
-    period: searchParams.period === 'today' ? 'today' : undefined,
-    startDate: searchParams.startDate,
-    endDate: searchParams.endDate,
+    period: resolvedSearchParams.period === 'today' ? 'today' : undefined,
+    startDate: resolvedSearchParams.startDate,
+    endDate: resolvedSearchParams.endDate,
   }
 
   let feedback = []
@@ -77,7 +78,7 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
 
   try {
     feedback = await getAllFeedback(slug, filters)
-    if (searchParams.sent === '1') {
+    if (resolvedSearchParams.sent === '1') {
       sentMessage = 'Low-rating reminder email sent successfully.'
     }
   } catch (error) {
@@ -152,7 +153,7 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
                 <input
                   name="startDate"
                   type="date"
-                  defaultValue={searchParams.startDate ?? ''}
+                  defaultValue={resolvedSearchParams.startDate ?? ''}
                   className="rounded-md border border-muted/50 bg-background px-3 py-2 text-sm"
                 />
               </label>
@@ -161,7 +162,7 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
                 <input
                   name="endDate"
                   type="date"
-                  defaultValue={searchParams.endDate ?? ''}
+                  defaultValue={resolvedSearchParams.endDate ?? ''}
                   className="rounded-md border border-muted/50 bg-background px-3 py-2 text-sm"
                 />
               </label>
@@ -171,7 +172,7 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
                 type="checkbox"
                 name="period"
                 value="today"
-                defaultChecked={searchParams.period === 'today'}
+                defaultChecked={resolvedSearchParams.period === 'today'}
                 className="h-4 w-4 rounded border-muted/50 text-primary"
               />
               Show only today
@@ -226,10 +227,10 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
             </h2>
             <p className="text-xs text-muted-foreground">
               Showing {feedback.length} entries for {selectedProviders.length ? selectedProviders.join(', ') : 'all providers'}{' '}
-              {searchParams.period === 'today' ? 'today' : searchParams.startDate || searchParams.endDate ? 'in date range' : ''}.
+              {resolvedSearchParams.period === 'today' ? 'today' : resolvedSearchParams.startDate || resolvedSearchParams.endDate ? 'in date range' : ''}.
             </p>
           </div>
-          <form action={sendLowRatingReminder} method="post">
+          <form action={sendLowRatingReminder}>
             <input type="hidden" name="hotelSlug" value={slug} />
             <button
               type="submit"

@@ -41,3 +41,28 @@ export async function ensureFeedbackTable() {
     )
   }
 }
+
+export async function ensureHotelsTable() {
+  ensureDbConfigured()
+
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS hotels (
+        id SERIAL PRIMARY KEY,
+        slug TEXT NOT NULL UNIQUE,
+        name TEXT NOT NULL,
+        location TEXT NOT NULL,
+        google_review_url TEXT NOT NULL,
+        tripadvisor_url TEXT NOT NULL,
+        admin_username TEXT NOT NULL,
+        admin_password TEXT NOT NULL,
+        admin_email TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT now()
+      )
+    `)
+  } catch (error) {
+    throw new Error(
+      `Unable to initialize hotels table: ${error instanceof Error ? error.message : String(error)}`,
+    )
+  }
+}

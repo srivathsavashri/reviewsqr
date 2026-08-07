@@ -10,7 +10,7 @@ type Props = {
 
 export default async function HotelSignInPage({ params }: Props) {
   const { slug } = await params
-  const hotel = findHotel(slug)
+  const hotel = await findHotel(slug)
   if (!hotel) return notFound()
 
   return <AuthForm hotel={hotel} />

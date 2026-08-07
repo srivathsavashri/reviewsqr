@@ -11,7 +11,7 @@ export async function signInAdmin(
   password: string,
   hotelSlug: string,
 ) {
-  if (!verifyCredentials(username, password, hotelSlug)) {
+  if (!(await verifyCredentials(username, password, hotelSlug))) {
     return { ok: false as const, error: 'Invalid username or password' }
   }
   await createAdminSession(hotelSlug)

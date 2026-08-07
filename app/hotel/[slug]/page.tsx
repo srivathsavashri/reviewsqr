@@ -10,17 +10,11 @@ type Props = {
 
 export default async function HotelPage({ params }: Props) {
   const { slug } = await params
-  const hotel = findHotel(slug)
+  const hotel = await findHotel(slug)
   if (!hotel) return notFound()
 
-  const googleHref =
-    hotel.slug === 'surestay'
-      ? hotel.googleReviewUrl
-      : `/hotel/${hotel.slug}/google`
-  const tripAdvisorHref =
-    hotel.slug === 'surestay'
-      ? hotel.tripAdvisorUrl
-      : `/hotel/${hotel.slug}/tripadvisor`
+  const googleHref = `/hotel/${hotel.slug}/google`
+  const tripAdvisorHref = `/hotel/${hotel.slug}/tripadvisor`
 
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-4xl flex-col gap-6 px-4 py-10">
