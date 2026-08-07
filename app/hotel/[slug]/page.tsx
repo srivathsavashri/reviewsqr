@@ -10,17 +10,11 @@ type Props = {
 
 export default async function HotelPage({ params }: Props) {
   const { slug } = await params
-  const hotel = findHotel(slug)
+  const hotel = await findHotel(slug)
   if (!hotel) return notFound()
 
-  const googleHref =
-    hotel.slug === 'surestay'
-      ? hotel.googleReviewUrl
-      : `/hotel/${hotel.slug}/google`
-  const tripAdvisorHref =
-    hotel.slug === 'surestay'
-      ? hotel.tripAdvisorUrl
-      : `/hotel/${hotel.slug}/tripadvisor`
+  const googleHref = `/hotel/${hotel.slug}/google`
+  const tripAdvisorHref = `/hotel/${hotel.slug}/tripadvisor`
 
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-4xl flex-col gap-6 px-4 py-10">
@@ -38,6 +32,18 @@ export default async function HotelPage({ params }: Props) {
         >
           <span className="text-2xl font-semibold">TripAdvisor</span>
         </Link>
+
+        {hotel.slug === 'surestay' ? (
+          <Link
+            href="/hotel/surestay/all"
+            className="flex h-48 flex-col items-center justify-center rounded-3xl border border-border bg-card text-center text-foreground transition hover:border-primary/70 hover:shadow-lg sm:col-span-2"
+          >
+            <span className="text-2xl font-semibold">All review options</span>
+            <span className="mt-2 text-sm text-muted-foreground">
+              Google, TripAdvisor, Booking.com or Expedia
+            </span>
+          </Link>
+        ) : null}
       </section>
 
       <section className="mt-4 flex items-center justify-center">

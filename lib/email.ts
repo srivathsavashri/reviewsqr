@@ -1,4 +1,8 @@
 import type { Hotel } from '@/lib/hotels'
+import {
+  REVIEW_PROVIDER_LABELS,
+  type PublicReviewProvider,
+} from '@/lib/review-platforms'
 
 type LowRatingArgs = {
   hotel: Hotel
@@ -11,7 +15,7 @@ type LowRatingArgs = {
 
 type ReviewClickArgs = {
   hotel: Hotel
-  provider: 'google' | 'tripadvisor'
+  provider: PublicReviewProvider
   rating: number
 }
 
@@ -86,7 +90,11 @@ export async function sendLowRatingSummaryEmail(hotel: Hotel, reviews: Array<{
   const reviewRows = reviews
     .map((review) => {
       const starsText = stars(review.rating)
-      const type = review.kind === 'private' ? 'Private' : review.kind === 'google' ? 'Google' : 'TripAdvisor'
+      const type =
+        review.kind === 'private'
+          ? 'Private'
+          : REVIEW_PROVIDER_LABELS[review.kind as PublicReviewProvider] ||
+            review.kind
       return `
         <tr>
           <td style="padding: 8px; border: 1px solid #e2e8f0; vertical-align: top;">
@@ -120,7 +128,7 @@ export async function sendLowRatingSummaryEmail(hotel: Hotel, reviews: Array<{
 
 export async function sendReviewClickEmail(args: ReviewClickArgs) {
   const { hotel, provider, rating } = args
-  const providerName = provider === 'google' ? 'Google' : 'TripAdvisor'
+  const providerName = REVIEW_PROVIDER_LABELS[provider]
 
   await sendGridEmail({
     to: hotel.adminEmail,

@@ -26,8 +26,10 @@ export async function ensureFeedbackTable() {
       CREATE TABLE IF NOT EXISTS feedback (
         id SERIAL PRIMARY KEY,
         hotel_slug TEXT NOT NULL,
-        rating INTEGER NOT NULL,
-        kind TEXT NOT NULL DEFAULT 'private',
+        rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+        kind TEXT NOT NULL DEFAULT 'private' CHECK (
+          kind IN ('private', 'google', 'tripadvisor', 'booking', 'expedia')
+        ),
         guest_name TEXT,
         guest_email TEXT,
         guest_phone TEXT,
@@ -38,6 +40,31 @@ export async function ensureFeedbackTable() {
   } catch (error) {
     throw new Error(
       `Unable to initialize feedback table: ${error instanceof Error ? error.message : String(error)}`,
+    )
+  }
+}
+
+export async function ensureHotelsTable() {
+  ensureDbConfigured()
+
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS hotels (
+        id SERIAL PRIMARY KEY,
+        slug TEXT NOT NULL UNIQUE,
+        name TEXT NOT NULL,
+        location TEXT NOT NULL,
+        google_review_url TEXT NOT NULL,
+        tripadvisor_url TEXT NOT NULL,
+        admin_username TEXT NOT NULL,
+        admin_password TEXT NOT NULL,
+        admin_email TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT now()
+      )
+    `)
+  } catch (error) {
+    throw new Error(
+      `Unable to initialize hotels table: ${error instanceof Error ? error.message : String(error)}`,
     )
   }
 }

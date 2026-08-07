@@ -3,25 +3,35 @@ import { ArrowLeft, ExternalLink, MessageSquare, Star } from 'lucide-react'
 import { isAdmin } from '@/lib/admin-auth'
 import { getAllFeedback, sendLowRatingReminder } from '@/app/actions/feedback'
 import { FeedbackList } from '@/components/feedback-list'
+import type { Feedback } from '@/lib/db/schema'
 import { SignOutButton } from '@/components/sign-out-button'
 import { Card } from '@/components/ui/card'
 import { findHotel } from '@/lib/hotels'
+import {
+  REVIEW_PROVIDER_LABELS,
+  type PublicReviewProvider,
+} from '@/lib/review-platforms'
 
 export const dynamic = 'force-dynamic'
 
-type FeedbackProvider = 'private' | 'google' | 'tripadvisor'
+type FeedbackProvider =
+  | 'private'
+  | 'google'
+  | 'tripadvisor'
+  | 'booking'
+  | 'expedia'
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string
-  }
-  searchParams: {
+  }>
+  searchParams: Promise<{
     providers?: string | string[]
     period?: string
     startDate?: string
     endDate?: string
     sent?: string
-  }
+  }>
 }
 
 function StatCard({
@@ -50,34 +60,36 @@ function StatCard({
 
 export default async function HotelAdminPage({ params, searchParams }: Props) {
   const { slug } = await params
-  const hotel = findHotel(slug)
+  const hotel = await findHotel(slug)
   if (!hotel) return notFound()
 
-  if (!(await isAdmin(slug))) redirect(`/hotel/${slug}`)
+  if (!(await isAdmin(slug))) redirect(`/hotel/${slug}/sign-in`)
 
-  const providerParams = Array.isArray(searchParams.providers)
-    ? searchParams.providers
-    : searchParams.providers
-    ? [searchParams.providers]
+  const resolvedSearchParams = await searchParams
+  const providerParams = Array.isArray(resolvedSearchParams.providers)
+    ? resolvedSearchParams.providers
+    : resolvedSearchParams.providers
+    ? [resolvedSearchParams.providers]
     : []
   const selectedProviders = providerParams.filter((provider) =>
-    ['private', 'google', 'tripadvisor'].includes(provider),
+    ['private', 'google', 'tripadvisor', 'booking', 'expedia'].includes(provider),
   ) as FeedbackProvider[]
 
   const filters = {
     providers: selectedProviders,
-    period: searchParams.period === 'today' ? 'today' : undefined,
-    startDate: searchParams.startDate,
-    endDate: searchParams.endDate,
+    period:
+      resolvedSearchParams.period === 'today' ? ('today' as const) : undefined,
+    startDate: resolvedSearchParams.startDate,
+    endDate: resolvedSearchParams.endDate,
   }
 
-  let feedback = []
+  let feedback: Feedback[] = []
   let loadError: string | null = null
   let sentMessage: string | null = null
 
   try {
     feedback = await getAllFeedback(slug, filters)
-    if (searchParams.sent === '1') {
+    if (resolvedSearchParams.sent === '1') {
       sentMessage = 'Low-rating reminder email sent successfully.'
     }
   } catch (error) {
@@ -89,6 +101,8 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
   const privateCount = feedback.filter((f) => f.kind === 'private').length
   const googleCount = feedback.filter((f) => f.kind === 'google').length
   const tripAdvisorCount = feedback.filter((f) => f.kind === 'tripadvisor').length
+  const bookingCount = feedback.filter((f) => f.kind === 'booking').length
+  const expediaCount = feedback.filter((f) => f.kind === 'expedia').length
   const avgRating =
     total > 0
       ? (feedback.reduce((sum, f) => sum + f.rating, 0) / total).toFixed(1)
@@ -126,7 +140,15 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
           <div>
             <p className="text-sm font-semibold text-foreground">Filter by provider</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              {(['private', 'google', 'tripadvisor'] as FeedbackProvider[]).map((provider) => (
+              {(
+                [
+                  'private',
+                  'google',
+                  'tripadvisor',
+                  'booking',
+                  'expedia',
+                ] as FeedbackProvider[]
+              ).map((provider) => (
                 <label
                   key={provider}
                   className="inline-flex items-center gap-2 rounded-md border border-muted/50 bg-background px-3 py-2 text-sm"
@@ -138,7 +160,11 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
                     defaultChecked={selectedProviders.includes(provider)}
                     className="h-4 w-4 rounded border-muted/50 text-primary"
                   />
-                  {provider === 'private' ? 'Private' : provider === 'google' ? 'Google' : 'TripAdvisor'}
+                  {provider === 'private'
+                    ? 'Private'
+                    : REVIEW_PROVIDER_LABELS[
+                        provider as PublicReviewProvider
+                      ]}
                 </label>
               ))}
             </div>
@@ -152,7 +178,7 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
                 <input
                   name="startDate"
                   type="date"
-                  defaultValue={searchParams.startDate ?? ''}
+                  defaultValue={resolvedSearchParams.startDate ?? ''}
                   className="rounded-md border border-muted/50 bg-background px-3 py-2 text-sm"
                 />
               </label>
@@ -161,7 +187,7 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
                 <input
                   name="endDate"
                   type="date"
-                  defaultValue={searchParams.endDate ?? ''}
+                  defaultValue={resolvedSearchParams.endDate ?? ''}
                   className="rounded-md border border-muted/50 bg-background px-3 py-2 text-sm"
                 />
               </label>
@@ -171,7 +197,7 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
                 type="checkbox"
                 name="period"
                 value="today"
-                defaultChecked={searchParams.period === 'today'}
+                defaultChecked={resolvedSearchParams.period === 'today'}
                 className="h-4 w-4 rounded border-muted/50 text-primary"
               />
               Show only today
@@ -213,7 +239,9 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
         />
         <StatCard
           label="Sent to public review"
-          value={String(googleCount + tripAdvisorCount)}
+          value={String(
+            googleCount + tripAdvisorCount + bookingCount + expediaCount,
+          )}
           icon={<ExternalLink className="size-5" />}
         />
       </section>
@@ -226,11 +254,10 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
             </h2>
             <p className="text-xs text-muted-foreground">
               Showing {feedback.length} entries for {selectedProviders.length ? selectedProviders.join(', ') : 'all providers'}{' '}
-              {searchParams.period === 'today' ? 'today' : searchParams.startDate || searchParams.endDate ? 'in date range' : ''}.
+              {resolvedSearchParams.period === 'today' ? 'today' : resolvedSearchParams.startDate || resolvedSearchParams.endDate ? 'in date range' : ''}.
             </p>
           </div>
-          <form action={sendLowRatingReminder} method="post">
-            <input type="hidden" name="hotelSlug" value={slug} />
+          <form action={sendLowRatingReminder.bind(null, slug)}>
             <button
               type="submit"
               className="rounded-md bg-secondary px-4 py-2 text-sm font-semibold text-white"

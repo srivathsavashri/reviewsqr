@@ -15,7 +15,6 @@ export default function Page() {
           Select the hotel where you stayed and leave feedback. Low ratings are sent privately to the hotel admin, while 4-5 star guests can choose a public review path.
         </p>
       </div>
-
       <div className="grid gap-4 md:grid-cols-3">
         {HOTELS.map((hotel) => (
           <Link
