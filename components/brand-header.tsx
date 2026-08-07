@@ -25,50 +25,39 @@ export function BrandHeader({ hotel, provider }: Props) {
         </p>
       ) : null}
 
-      <div className="mt-2 flex flex-col items-center justify-center gap-2">
-        {isTripadvisor ? (
-          <div className="flex items-center gap-2">
-            <Image
-              src="/tripadvisor-owl.svg"
-              alt="TripAdvisor"
-              width={26}
-              height={26}
-              className="size-6"
-            />
-            <span className="font-display text-xl font-bold tracking-tight text-foreground">
-              TripAdvisor
-            </span>
-          </div>
-        ) : isGoogle ? (
-          <div className="flex items-center justify-center gap-1 text-[2.4rem] font-semibold leading-none">
-            <span className="text-[#4285F4]">G</span>
-            <span className="text-[#EA4335]">o</span>
-            <span className="text-[#FBBC05]">o</span>
-            <span className="text-[#4285F4]">g</span>
-            <span className="text-[#34A853]">l</span>
-            <span className="text-[#EA4335]">e</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Image
-              src="/tripadvisor-owl.svg"
-              alt="TripAdvisor"
-              width={26}
-              height={26}
-              className="size-6"
-            />
-            <span className="font-display text-xl font-bold tracking-tight text-foreground">
-              TripAdvisor
-            </span>
-          </div>
-        )}
+      {provider ? (
+        <div className="mt-2 flex flex-col items-center justify-center gap-2">
+          {isTripadvisor ? (
+            <div className="flex items-center gap-2">
+              <Image
+                src="/tripadvisor-owl.svg"
+                alt="TripAdvisor"
+                width={26}
+                height={26}
+                className="size-6"
+              />
+              <span className="font-display text-xl font-bold tracking-tight text-foreground">
+                TripAdvisor
+              </span>
+            </div>
+          ) : isGoogle ? (
+            <div className="flex items-center justify-center gap-1 text-[2.4rem] font-semibold leading-none">
+              <span className="text-[#4285F4]">G</span>
+              <span className="text-[#EA4335]">o</span>
+              <span className="text-[#FBBC05]">o</span>
+              <span className="text-[#4285F4]">g</span>
+              <span className="text-[#34A853]">l</span>
+              <span className="text-[#EA4335]">e</span>
+            </div>
+          ) : null}
 
-        {showProviderLocation ? (
-          <p className="text-xs font-semibold tracking-[0.3em] text-foreground">
-            {locationLine}
-          </p>
-        ) : null}
-      </div>
+          {showProviderLocation ? (
+            <p className="text-xs font-semibold tracking-[0.3em] text-foreground">
+              {locationLine}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   )
 }

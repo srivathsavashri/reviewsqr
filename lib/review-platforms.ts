@@ -21,3 +21,10 @@ export const REVIEW_PROVIDER_LABELS: Record<PublicReviewProvider, string> = {
   booking: 'Booking.com',
   expedia: 'Expedia',
 }
+
+export const REVIEW_PROVIDER_LOGOS: Record<PublicReviewProvider, string> = {
+  google: '/google-logo.svg',
+  tripadvisor: '/tripadvisor-logo.svg',
+  booking: '/booking-logo.svg',
+  expedia: '/expedia-logo.svg',
+}

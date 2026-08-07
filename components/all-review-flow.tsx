@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, ExternalLink } from 'lucide-react'
+import Image from 'next/image'
+import { CheckCircle2 } from 'lucide-react'
 import { logReviewClick } from '@/app/actions/feedback'
 import { BrandHeader } from '@/components/brand-header'
 import { PrivateFeedbackForm } from '@/components/private-feedback-form'
@@ -10,18 +11,12 @@ import { Card } from '@/components/ui/card'
 import type { Hotel } from '@/lib/hotels'
 import {
   REVIEW_PROVIDER_LABELS,
+  REVIEW_PROVIDER_LOGOS,
   SURESTAY_REVIEW_URLS,
   type PublicReviewProvider,
 } from '@/lib/review-platforms'
 
 type Step = 'rate' | 'private' | 'platforms' | 'thanks'
-
-const platformDescriptions: Record<PublicReviewProvider, string> = {
-  google: 'Share a quick public review on Google.',
-  tripadvisor: 'Help future travelers on TripAdvisor.',
-  booking: 'Review your stay on Booking.com.',
-  expedia: 'Share your experience with Expedia travelers.',
-}
 
 export function AllReviewFlow({ hotel }: { hotel: Hotel }) {
   const [step, setStep] = useState<Step>('rate')
@@ -101,17 +96,18 @@ export function AllReviewFlow({ hotel }: { hotel: Hotel }) {
                   type="button"
                   onClick={() => choosePlatform(provider)}
                   disabled={loadingProvider !== null}
-                  className="flex min-h-28 items-center justify-between gap-4 rounded-2xl border border-border bg-background p-4 text-left transition hover:border-primary/70 hover:bg-accent disabled:cursor-wait disabled:opacity-60"
+                  className="flex min-h-28 flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-background p-4 text-center transition hover:border-primary/70 hover:bg-accent disabled:cursor-wait disabled:opacity-60"
                 >
-                  <span>
-                    <span className="block text-lg font-semibold text-foreground">
-                      {REVIEW_PROVIDER_LABELS[provider]}
-                    </span>
-                    <span className="mt-1 block text-sm leading-5 text-muted-foreground">
-                      {platformDescriptions[provider]}
-                    </span>
+                  <Image
+                    src={REVIEW_PROVIDER_LOGOS[provider]}
+                    alt={REVIEW_PROVIDER_LABELS[provider]}
+                    width={40}
+                    height={40}
+                    className="h-8 w-auto"
+                  />
+                  <span className="text-base font-semibold text-foreground">
+                    {REVIEW_PROVIDER_LABELS[provider]}
                   </span>
-                  <ExternalLink className="size-5 shrink-0 text-primary" aria-hidden="true" />
                 </button>
               ),
             )}
