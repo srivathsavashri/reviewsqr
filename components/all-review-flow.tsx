@@ -88,7 +88,7 @@ export function AllReviewFlow({ hotel }: { hotel: Hotel }) {
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="flex flex-col gap-3">
             {(Object.keys(REVIEW_PROVIDER_LABELS) as PublicReviewProvider[]).map(
               (provider) => (
                 <button
@@ -96,18 +96,21 @@ export function AllReviewFlow({ hotel }: { hotel: Hotel }) {
                   type="button"
                   onClick={() => choosePlatform(provider)}
                   disabled={loadingProvider !== null}
-                  className="flex min-h-28 flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-background p-4 text-center transition hover:border-primary/70 hover:bg-accent disabled:cursor-wait disabled:opacity-60"
+                  aria-label={`Continue to ${REVIEW_PROVIDER_LABELS[provider]}`}
+                  className="flex min-h-20 w-full items-center justify-center gap-4 rounded-2xl border border-border bg-background px-6 py-4 text-center transition hover:border-primary/70 hover:bg-accent disabled:cursor-wait disabled:opacity-60"
                 >
                   <Image
                     src={REVIEW_PROVIDER_LOGOS[provider]}
-                    alt={REVIEW_PROVIDER_LABELS[provider]}
-                    width={40}
-                    height={40}
-                    className="h-8 w-auto"
+                    alt=""
+                    width={48}
+                    height={48}
+                    className="h-9 w-auto shrink-0"
                   />
-                  <span className="text-base font-semibold text-foreground">
-                    {REVIEW_PROVIDER_LABELS[provider]}
-                  </span>
+                  {provider !== 'google' ? (
+                    <span className="text-lg font-semibold text-foreground">
+                      {REVIEW_PROVIDER_LABELS[provider]}
+                    </span>
+                  ) : null}
                 </button>
               ),
             )}
