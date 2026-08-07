@@ -106,11 +106,9 @@ export function AllReviewFlow({ hotel }: { hotel: Hotel }) {
                     height={48}
                     className="h-9 w-auto shrink-0"
                   />
-                  {provider !== 'google' ? (
-                    <span className="text-lg font-semibold text-foreground">
-                      {REVIEW_PROVIDER_LABELS[provider]}
-                    </span>
-                  ) : null}
+                  <span className="text-lg font-semibold text-foreground">
+                    {REVIEW_PROVIDER_LABELS[provider]}
+                  </span>
                 </button>
               ),
             )}
