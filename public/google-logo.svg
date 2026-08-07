@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 272 92">
+  <defs>
+    <style>
+      .g { fill: #4285F4; }
+      .o1 { fill: #EA4335; }
+      .o2 { fill: #FBBC05; }
+      .g2 { fill: #34A853; }
+      .l { fill: #4285F4; }
+      .e { fill: #EA4335; }
+    </style>
+  </defs>
+  <path class="g" d="M31.5 55.1h-9.4V36.7h9.4c3.3 0 5.7 2.4 5.7 5.9v6.5c0 3.3-2.4 5.9-5.7 5.9z"/>
+  <path class="o1" d="M31.5 33.5h-9.4v-9.4h9.4c3.3 0 5.7 2.4 5.7 5.9v6.5c0 3.4-2.4 5.9-5.7 5.9z"/>
+  <path class="o2" d="M31.5 60.4h-9.4v-9.4h9.4c3.3 0 5.7 2.4 5.7 5.9v6.5c0 3.4-2.4 5.9-5.7 5.9z"/>
+  <path class="g2" d="M31.5 39.3h-9.4v-9.4h9.4c3.3 0 5.7 2.4 5.7 5.9v6.5c0 3.4-2.4 5.9-5.7 5.9z"/>
+  <text x="58" y="60" font-family="Product Sans, Roboto, sans-serif" font-size="64" font-weight="700">
+    <tspan class="g">G</tspan>
+    <tspan class="o1">o</tspan>
+    <tspan class="o2">o</tspan>
+    <tspan class="g2">g</tspan>
+    <tspan class="l">l</tspan>
+    <tspan class="e">e</tspan>
+  </text>
+</svg>
