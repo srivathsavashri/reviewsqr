@@ -3,6 +3,7 @@ import { ArrowLeft, ExternalLink, MessageSquare, Star } from 'lucide-react'
 import { isAdmin } from '@/lib/admin-auth'
 import { getAllFeedback, sendLowRatingReminder } from '@/app/actions/feedback'
 import { FeedbackList } from '@/components/feedback-list'
+import type { Feedback } from '@/lib/db/schema'
 import { SignOutButton } from '@/components/sign-out-button'
 import { Card } from '@/components/ui/card'
 import { findHotel } from '@/lib/hotels'
@@ -76,12 +77,13 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
 
   const filters = {
     providers: selectedProviders,
-    period: resolvedSearchParams.period === 'today' ? 'today' : undefined,
+    period:
+      resolvedSearchParams.period === 'today' ? ('today' as const) : undefined,
     startDate: resolvedSearchParams.startDate,
     endDate: resolvedSearchParams.endDate,
   }
 
-  let feedback = []
+  let feedback: Feedback[] = []
   let loadError: string | null = null
   let sentMessage: string | null = null
 
@@ -255,8 +257,7 @@ export default async function HotelAdminPage({ params, searchParams }: Props) {
               {resolvedSearchParams.period === 'today' ? 'today' : resolvedSearchParams.startDate || resolvedSearchParams.endDate ? 'in date range' : ''}.
             </p>
           </div>
-          <form action={sendLowRatingReminder}>
-            <input type="hidden" name="hotelSlug" value={slug} />
+          <form action={sendLowRatingReminder.bind(null, slug)}>
             <button
               type="submit"
               className="rounded-md bg-secondary px-4 py-2 text-sm font-semibold text-white"

@@ -26,8 +26,10 @@ export async function ensureFeedbackTable() {
       CREATE TABLE IF NOT EXISTS feedback (
         id SERIAL PRIMARY KEY,
         hotel_slug TEXT NOT NULL,
-        rating INTEGER NOT NULL,
-        kind TEXT NOT NULL DEFAULT 'private',
+        rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+        kind TEXT NOT NULL DEFAULT 'private' CHECK (
+          kind IN ('private', 'google', 'tripadvisor', 'booking', 'expedia')
+        ),
         guest_name TEXT,
         guest_email TEXT,
         guest_phone TEXT,

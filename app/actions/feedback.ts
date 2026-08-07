@@ -2,7 +2,7 @@
 
 import { isAdmin } from '@/lib/admin-auth'
 import { db, ensureFeedbackTable } from '@/lib/db'
-import { feedback } from '@/lib/db/schema'
+import { feedback, type Feedback as FeedbackRecord } from '@/lib/db/schema'
 import { and, desc, eq, gte, inArray, lte } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
@@ -46,17 +46,7 @@ type LogReviewClickArgs = {
   provider: Exclude<FeedbackProvider, 'private'>
 }
 
-type DemoFeedbackRecord = {
-  id: number
-  hotelSlug: string
-  rating: number
-  kind: FeedbackProvider
-  guestName?: string | null
-  guestEmail?: string | null
-  guestPhone?: string | null
-  message?: string | null
-  createdAt: Date
-}
+type DemoFeedbackRecord = FeedbackRecord & { kind: FeedbackProvider }
 
 const demoFeedbackStore: DemoFeedbackRecord[] = []
 let demoFeedbackCounter = 1
@@ -170,6 +160,10 @@ export async function logReviewClick(args: LogReviewClickArgs) {
     hotelSlug: args.hotelSlug,
     rating: r,
     kind: args.provider,
+    guestName: null,
+    guestEmail: null,
+    guestPhone: null,
+    message: null,
     createdAt: new Date(),
   }
 
